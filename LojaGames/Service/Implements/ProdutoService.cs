@@ -63,12 +63,12 @@ namespace LojaGames.Service.Implements
         {
             if (produto.Categoria is not null)
             {
-                var BuscarTema = await _context.Categorias.FindAsync(produto.Categoria.Id);
+                var BuscarCategoria = await _context.Categorias.FindAsync(produto.Categoria.Id);
 
-                if (BuscarTema is null)
+                if (BuscarCategoria is null)
                     return null;
 
-                produto.Categoria = BuscarTema;
+                produto.Categoria = BuscarCategoria;
             }
 
             await _context.Produtos.AddAsync(produto);

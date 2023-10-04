@@ -22,7 +22,6 @@ namespace LojaGames.Model
         public string Console { get; set; } = string.Empty;
 
         [Column(TypeName = "date")]
-        [StringLength(1000)]
         public DateOnly DataLancamento { get; set; }
 
         [Column(TypeName = "decimal(6,2)")]

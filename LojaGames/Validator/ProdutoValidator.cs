@@ -22,7 +22,9 @@ namespace LojaGames.Validator
             RuleFor(p => p.DataLancamento)
                 .NotEmpty();
             RuleFor(p => p.Preco)
-                .NotEmpty();
+                .NotNull()
+                .GreaterThan(0)
+                .PrecisionScale(10, 2, false);
             RuleFor(p => p.Foto)
                 .NotEmpty()
                 .MinimumLength(5)
