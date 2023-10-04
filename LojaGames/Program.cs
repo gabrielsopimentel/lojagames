@@ -6,6 +6,11 @@ using FluentValidation;
 using LojaGames.Model;
 using LojaGames.Validator;
 using Microsoft.EntityFrameworkCore;
+using LojaGames.Security.Implements;
+using LojaGames.Security;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace LojaGames
 {
@@ -19,6 +24,7 @@ namespace LojaGames
             .AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
             });
 
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -26,11 +32,32 @@ namespace LojaGames
 
             builder.Services.AddTransient<IValidator<Produto>, ProdutoValidator>();
             builder.Services.AddTransient<IValidator<Categoria>, CategoriaValidator>();
+            builder.Services.AddTransient<IValidator<User>, UserValidator>();
+
 
             // Add services to the container.
             builder.Services.AddScoped<IProdutoService, ProdutoService>();
             builder.Services.AddScoped<ICategoriaService, CategoriaService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
 
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                var key = Encoding.UTF8.GetBytes(Settings.Secret);
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                };
+            });
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -64,8 +91,10 @@ namespace LojaGames
             }
 
             app.UseCors("MyPolicy");
-            app.UseAuthorization();
 
+            app.UseAuthentication();
+
+            app.UseAuthorization();
 
             app.MapControllers();
 

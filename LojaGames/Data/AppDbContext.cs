@@ -1,7 +1,6 @@
 ﻿using LojaGames.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using System.Security.AccessControl;
 
 namespace LojaGames.Data
 {
@@ -13,6 +12,8 @@ namespace LojaGames.Data
         {
             modelBuilder.Entity<Produto>().ToTable("tb_produtos");
             modelBuilder.Entity<Categoria>().ToTable("tb_categorias");
+            modelBuilder.Entity<User>().ToTable("tb_usuarios");
+
 
             _ = modelBuilder.Entity<Produto>()
                 .HasOne(_ => _.Categoria)
@@ -23,6 +24,7 @@ namespace LojaGames.Data
         //registrar dbset - objeto resposável por manipular a tabela
         public DbSet<Produto> Produtos { get; set; } = null!;
         public DbSet<Categoria> Categorias { get; set; } = null!;
+        public DbSet<User> Users { get; set; } = null!;
 
         public class DateOnlyConverter : ValueConverter<DateOnly, DateTime>
         {
